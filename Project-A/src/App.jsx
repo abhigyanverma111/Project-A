@@ -1,11 +1,19 @@
 
 import './App.css'
+import { Route, Routes } from 'react-router-dom';
+import SignInPage from './components/SignInPage';
 
 function App() {
   
 
   return (
-    <h1>Hello world</h1>
+    <div>
+      <Routes>
+        <Route path={'/'} element={<SignInPage/>} />
+
+        
+      </Routes>
+    </div>
   )
 }
 
