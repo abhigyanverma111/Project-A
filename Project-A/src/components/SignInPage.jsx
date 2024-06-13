@@ -9,6 +9,8 @@ function AuthPage() {
     setIsSignUp(!isSignUp);
   };
 
+  const handleSignIn = () => {};
+
   const handleSubmit = (event) => {
     event.preventDefault();
     // Perform sign-in or sign-up logic here
