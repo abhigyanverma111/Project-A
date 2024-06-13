@@ -1,17 +1,26 @@
-// src/AuthPage.js
-import  { useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const navigate = useNavigate();
 
   const toggleAuthMode = () => {
     setIsSignUp(!isSignUp);
   };
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    // Perform sign-in or sign-up logic here
+    console.log("Form submitted");
+    // On successful sign-in/sign-up, navigate to the chat page
+    navigate("/chat-page");
+  };
+
   return (
     <div className="auth-container">
       <h2>{isSignUp ? "Sign Up" : "Sign In"}</h2>
-      <form>
+      <form onSubmit={handleSubmit}>
         {isSignUp && (
           <>
             <div id="signupEmail">
