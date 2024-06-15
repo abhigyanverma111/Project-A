@@ -9,14 +9,53 @@ function AuthPage() {
     setIsSignUp(!isSignUp);
   };
 
-  const handleSignIn = () => {};
+  const handleSignIn = async (formData) => {
+    const response = await fetch(
+      "", // <<-- api url goes here
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          signUp: false,
+          email: formData.get("usernameOrEmail"),
+          password: formData.get("password"),
+        }),
+      }
+    );
+    // success / faliure handling here
+  };
+  const handleSignUp = async (formdata) => {
+    const response = await fetch(
+      "", // <<-- api url goes here
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          signUp: true,
+          email: formData.get("usernameOrEmail"),
+          password: formData.get("password"),
+        }),
+      }
+    );
+
+    // success / faliure handling here
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     // Perform sign-in or sign-up logic here
+    const formData = new FormData(event.target);
     console.log("Form submitted");
     // On successful sign-in/sign-up, navigate to the chat page
-    navigate("/chat-page");
+    if (!isSignUp) {
+      handleSignIn(formData);
+    } else if (isSignUp) {
+      handleSignUp(formData);
+    }
   };
 
   return (
