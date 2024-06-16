@@ -11,7 +11,7 @@ function AuthPage() {
 
   const handleSignIn = async (formData) => {
     const response = await fetch(
-      "", // <<-- api url goes here
+      "http://127.0.0.1:4000/api/signin", // <<-- api url goes here
       {
         method: "POST",
         headers: {
@@ -24,6 +24,14 @@ function AuthPage() {
         }),
       }
     );
+    const data = await response.json();
+    console.log(data.msg);
+    if (response.ok) {
+      if (data.msg == "siginIn successful") {
+        console.log();
+        navigate("/chat-page");
+      }
+    }
     // success / faliure handling here
   };
   const handleSignUp = async (formdata) => {
