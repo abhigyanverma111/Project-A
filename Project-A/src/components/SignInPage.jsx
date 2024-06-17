@@ -19,18 +19,16 @@ function AuthPage() {
         },
         body: JSON.stringify({
           signUp: false,
-          email: formData.get("usernameOrEmail"),
+          email: formData.get("email"),
           password: formData.get("password"),
         }),
       }
     );
     const data = await response.json();
-    console.log(data.msg);
-    if (response.ok) {
-      if (data.msg == "siginIn successful") {
-        console.log();
-        navigate("/chat-page");
-      }
+    console.log(data);
+    if (data.status == "approved") {
+      console.log("siginIn successful");
+      navigate("/chat-page");
     }
     // success / faliure handling here
   };
@@ -74,15 +72,30 @@ function AuthPage() {
           <>
             <div id="signupEmail">
               <label htmlFor="email">Email:</label>
-              <input type="email" placeholder="Enter email" required />
+              <input
+                type="email"
+                placeholder="Enter email"
+                required
+                name="email"
+              />
             </div>
             <div id="signupPassword">
               <label htmlFor="password">Password:</label>
-              <input type="password" placeholder="Enter password" required />
+              <input
+                type="password"
+                placeholder="Enter password"
+                required
+                name="password"
+              />
             </div>
             <div id="signupConfirmPassword">
               <label htmlFor="confirm password">Confirm Password:</label>
-              <input type="password" placeholder="Confirm password" required />
+              <input
+                type="password"
+                placeholder="Confirm password"
+                required
+                name="cpassword"
+              />
             </div>
           </>
         )}
@@ -90,11 +103,21 @@ function AuthPage() {
           <>
             <div id="signInUsername/email">
               <label htmlFor="username/email">Username/Email:</label>
-              <input type="text" placeholder="Enter username/email" required />
+              <input
+                type="text"
+                placeholder="Enter username/email"
+                required
+                name="email"
+              />
             </div>
             <div id="signInPassword">
               <label htmlFor="password">Password:</label>
-              <input type="password" placeholder="Enter password" required />
+              <input
+                type="password"
+                placeholder="Enter password"
+                required
+                name="password"
+              />
             </div>
           </>
         )}
