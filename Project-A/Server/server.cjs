@@ -48,7 +48,15 @@ app.post("/api/signin", async (req, res) => {
     const user = await login_credentials.findOne({ email: email });
     if (!user) {
       console.log("Username or email not found");
-      return res.status(400).json({ msg: "Username or email not found" });
+      return res.status(400).json({
+        msg: "Username or email not found",
+        status: "failed",
+        user: {
+          email: user.email,
+          username: user.username,
+          password: user.password,
+        },
+      });
     }
     console.log("record found", user);
     if (password == user.password) {
@@ -63,7 +71,10 @@ app.post("/api/signin", async (req, res) => {
         },
       });
     }
-    return res.status(400).json({ msg: "password was incorrect" });
+    return res.status(400).json({
+      msg: "Incorrect password",
+      status: "failed",
+    });
   } catch (error) {
     res.status(500).send("server error");
   }

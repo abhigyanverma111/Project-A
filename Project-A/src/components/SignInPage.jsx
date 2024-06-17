@@ -29,8 +29,9 @@ function AuthPage() {
     if (data.status == "approved") {
       console.log("siginIn successful");
       navigate("/chat-page");
+    } else {
+      // sign in failure code goes here
     }
-    // success / faliure handling here
   };
   const handleSignUp = async (formdata) => {
     const response = await fetch(
