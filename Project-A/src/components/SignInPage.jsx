@@ -10,22 +10,18 @@ function AuthPage() {
   };
 
   const handleSignIn = async (formData) => {
-    const response = await fetch(
-      "http://127.0.0.1:4000/api/signin", // <<-- api url goes here
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          signUp: false,
-          email: formData.get("email"),
-          password: formData.get("password"),
-        }),
-      }
-    );
+    const response = await fetch("http://127.0.0.1:4000/api/signin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        signUp: false,
+        email: formData.get("email"),
+        password: formData.get("password"),
+      }),
+    });
     const data = await response.json();
-    console.log(data);
     if (data.status == "approved") {
       console.log("siginIn successful");
       navigate("/chat-page");
@@ -33,31 +29,36 @@ function AuthPage() {
       // sign in failure code goes here
     }
   };
-  const handleSignUp = async (formdata) => {
-    const response = await fetch(
-      "", // <<-- api url goes here
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          signUp: true,
-          email: formData.get("usernameOrEmail"),
-          password: formData.get("password"),
-        }),
-      }
-    );
-
+  const handleSignUp = async (formData) => {
+    if (formData.get("password") !== formData.get("confirmPassword")) {
+      return console.log("passwords dont match");
+      // add passwords dont match script here
+    }
+    const response = await fetch("http://127.0.0.1:4000/api/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        signUp: true,
+        email: formData.get("email"),
+        password: formData.get("password"),
+      }),
+    });
+    const data = await response.json();
+    if (data.status == "approved") {
+      console.log("siginIn successful");
+      navigate("/chat-page");
+    } else {
+      // sign in failure code goes here
+    }
     // success / faliure handling here
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Perform sign-in or sign-up logic here
     const formData = new FormData(event.target);
     console.log("Form submitted");
-    // On successful sign-in/sign-up, navigate to the chat page
     if (!isSignUp) {
       handleSignIn(formData);
     } else if (isSignUp) {
@@ -90,12 +91,12 @@ function AuthPage() {
               />
             </div>
             <div id="signupConfirmPassword">
-              <label htmlFor="confirm password">Confirm Password:</label>
+              <label htmlFor="confirmPassword">Confirm Password:</label>
               <input
                 type="password"
                 placeholder="Confirm password"
                 required
-                name="cpassword"
+                name="confirmPassword"
               />
             </div>
           </>
