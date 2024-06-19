@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const login_credentials = require("./LoginCredentials.model.cjs");
+const active_chats = require("./ActiveChats.model.cjs");
 
 const app = express();
 
@@ -32,12 +33,26 @@ async function run() {
     console.log("failed to connect to mongodb database :-");
     console.error(error);
   }
+
+  // await active_chats.create({
+  //   username: "abhigyan",
+  //   activewith: "abhay",
+  // });
+  // await active_chats.create({
+  //   username: "abhay",
+  //   activewith: "abhigyan",
+  // });
+
+  // const activeChats = await active_chats.find({});
+  // console.log(activeChats);
 }
 
 // Routes definition
 app.get("/helloworld", (req, res) => {
   res.send("hello world");
 });
+
+app.post("/api/signup", async (req, res) => {});
 
 app.post("/api/signin", async (req, res) => {
   const { emailOrUsername, password } = req.body;
