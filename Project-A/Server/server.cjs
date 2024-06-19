@@ -52,7 +52,7 @@ app.get("/helloworld", (req, res) => {
   res.send("hello world");
 });
 
-app.post("/api/signup", async (req, res) => {});
+
 
 app.post("/api/signin", async (req, res) => {
   const { emailOrUsername, password } = req.body;
