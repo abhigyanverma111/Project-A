@@ -17,7 +17,7 @@ function AuthPage() {
       },
       body: JSON.stringify({
         signUp: false,
-        email: formData.get("email"),
+        emailOrUsername: formData.get("emailOrUsername"), // Changed key to emailOrUsername
         password: formData.get("password"),
       }),
     });
@@ -26,13 +26,14 @@ function AuthPage() {
       console.log("siginIn successful");
       navigate("/chat-page");
     } else {
-      // sign in failure code goes here
+      alert("Please verify your login details");
     }
   };
+
   const handleSignUp = async (formData) => {
     if (formData.get("password") !== formData.get("confirmPassword")) {
-      return console.log("passwords dont match");
-      // add passwords dont match script here
+      return console.log("Passwords don't match");
+      // Add passwords don't match script here
     }
     const response = await fetch("http://127.0.0.1:4000/api/signup", {
       method: "POST",
@@ -43,16 +44,17 @@ function AuthPage() {
         signUp: true,
         email: formData.get("email"),
         password: formData.get("password"),
+        username: formData.get("username"),
       }),
     });
     const data = await response.json();
     if (data.status == "approved") {
-      console.log("siginIn successful");
+      console.log("signUp successful");
       navigate("/chat-page");
     } else {
-      // sign in failure code goes here
+      console.log("Sign up failed");
     }
-    // success / faliure handling here
+    // Success / failure handling here
   };
 
   const handleSubmit = (event) => {
@@ -61,7 +63,7 @@ function AuthPage() {
     console.log("Form submitted");
     if (!isSignUp) {
       handleSignIn(formData);
-    } else if (isSignUp) {
+    } else {
       handleSignUp(formData);
     }
   };
@@ -79,6 +81,15 @@ function AuthPage() {
                 placeholder="Enter email"
                 required
                 name="email"
+              />
+            </div>
+            <div id="signupUsername">
+              <label htmlFor="username">Username:</label>
+              <input
+                type="text"
+                placeholder="Enter username"
+                required
+                name="username"
               />
             </div>
             <div id="signupPassword">
@@ -103,13 +114,13 @@ function AuthPage() {
         )}
         {!isSignUp && (
           <>
-            <div id="signInUsername/email">
-              <label htmlFor="username/email">Username/Email:</label>
+            <div id="signInUsernameOrEmail">
+              <label htmlFor="emailOrUsername">Username/Email:</label>
               <input
                 type="text"
-                placeholder="Enter username/email"
+                placeholder="Enter username or email"
                 required
-                name="email"
+                name="emailOrUsername" // Changed name to emailOrUsername
               />
             </div>
             <div id="signInPassword">
@@ -126,7 +137,7 @@ function AuthPage() {
         <button type="submit">{isSignUp ? "Sign Up" : "Sign In"}</button>
       </form>
       <button onClick={toggleAuthMode}>
-        {isSignUp ? "Already have an account" : "New User"}
+        {isSignUp ? "Already have an account?" : "New User?"}
       </button>
     </div>
   );

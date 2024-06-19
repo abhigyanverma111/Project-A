@@ -6,7 +6,7 @@ const login_credentials = require("./LoginCredentials.model.cjs");
 
 const app = express();
 
-// middleware
+// Middleware
 app.use(
   cors({
     origin: "http://localhost:5173", // Replace with your Vite development server URL
@@ -15,67 +15,108 @@ app.use(
   })
 );
 app.use(bodyParser.json());
-//
 
 const port = 4000;
+
 async function run() {
   try {
-    await mongoose.connect("mongodb://localhost:27017/test");
+    await mongoose.connect("mongodb://localhost:27017/test", {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     console.log("connected to mongodb");
     app.listen(port, () => {
       console.log(`server running on port ${port}`);
     });
-    // const loginCredentials = await login_credentials.find({});
-
-    // // Log the retrieved documents to the console
-    // console.log("Retrieved documents:", loginCredentials);
   } catch (error) {
-    console.log("falied to connect to mongodb database :-");
+    console.log("failed to connect to mongodb database :-");
     console.error(error);
   }
 }
-// routes definition
+
+// Routes definition
 app.get("/helloworld", (req, res) => {
   res.send("hello world");
 });
 
 app.post("/api/signin", async (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
+  const { emailOrUsername, password } = req.body;
   console.log(req.body);
 
   try {
-    const user = await login_credentials.findOne({ email: email });
+    // Find user by email or username
+    const user = await login_credentials.findOne({
+      $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
+    });
+
     if (!user) {
       console.log("Username or email not found");
       return res.status(400).json({
         msg: "Username or email not found",
         status: "failed",
-        user: {
-          email: user.email,
-          username: user.username,
-          password: user.password,
-        },
       });
     }
     console.log("record found", user);
-    if (password == user.password) {
+
+    // Compare the provided password with the stored password (plaintext)
+    if (password === user.password) {
       console.log("record matched!!");
       return res.json({
-        msg: "siginIn successful",
+        msg: "signIn successful",
         status: "approved",
         user: {
           email: user.email,
           username: user.username,
-          password: user.password,
         },
       });
+    } else {
+      return res.status(400).json({
+        msg: "Incorrect password",
+        status: "failed",
+      });
     }
-    return res.status(400).json({
-      msg: "Incorrect password",
-      status: "failed",
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("server error");
+  }
+});
+
+app.post("/api/signup", async (req, res) => {
+  const { email, password, username } = req.body;
+
+  console.log(req.body);
+
+  try {
+    // Check if user already exists by email or username
+    const existingUser = await login_credentials.findOne({
+      $or: [{ email: email }, { username: username }],
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        msg: "User already exists",
+        status: "failed",
+      });
+    }
+
+    // Create a new user
+    const newUser = new login_credentials({
+      email,
+      password, // Store the password in plaintext (not recommended)
+      username,
+    });
+
+    await newUser.save();
+    res.json({
+      msg: "SignUp successful",
+      status: "approved",
+      user: {
+        email: newUser.email,
+        username: newUser.username,
+      },
     });
   } catch (error) {
+    console.error(error);
     res.status(500).send("server error");
   }
 });
