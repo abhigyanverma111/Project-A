@@ -1,9 +1,12 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const crypto = require("crypto");
 const login_credentials = require("./LoginCredentials.model.cjs");
 const active_chats = require("./ActiveChats.model.cjs");
+const active_sesions = require("./ActiveSessions.model.cjs");
 
 const app = express();
 
@@ -12,19 +15,19 @@ app.use(
   cors({
     origin: "http://localhost:5173", // Replace with your Vite development server URL
     methods: "GET,POST,PUT,DELETE,OPTIONS",
+    credentials: true,
     allowedHeaders: "Content-Type,Authorization",
   })
 );
+
+app.use(cookieParser());
 app.use(bodyParser.json());
 
 const port = 4000;
 
 async function run() {
   try {
-    await mongoose.connect("mongodb://localhost:27017/test", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect("mongodb://localhost:27017/test");
     console.log("connected to mongodb");
     app.listen(port, () => {
       console.log(`server running on port ${port}`);
@@ -45,6 +48,7 @@ async function run() {
 
   // const activeChats = await active_chats.find({});
   // console.log(activeChats);
+  //
 }
 
 // Routes definition
@@ -52,7 +56,43 @@ app.get("/helloworld", (req, res) => {
   res.send("hello world");
 });
 
+app.post("/api/chatlist", async (req, res) => {
+  console.log(req);
+  const { username, sessionid } = req.cookies;
+  try {
+    const user = await login_credentials.findOne({ username: username });
+    if (!user) {
+      console.log("Username or email not found");
+      return res.status(400).json({
+        msg: "Username or email not found",
+        status: "failed",
+      });
+    }
 
+    const session = await active_sesions.findOne({ username: username });
+    if (!session) {
+      console.log("session not found");
+      return res.status(400).json({
+        msg: "session error, please login",
+        status: "falied",
+      });
+    }
+    if (session.sessionid === sessionid) {
+      console.log("record matched");
+      let chats = await active_chats.find({ username: username });
+      return res.json({ status: "approved", chats });
+    } else {
+      console.log("session not found");
+      return res.status(400).json({
+        msg: "bad login",
+        status: "falied",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("server error");
+  }
+});
 
 app.post("/api/signin", async (req, res) => {
   const { emailOrUsername, password } = req.body;
@@ -71,11 +111,34 @@ app.post("/api/signin", async (req, res) => {
         status: "failed",
       });
     }
-    console.log("record found", user);
+    //console.log("record found", user);
 
     // Compare the provided password with the stored password (plaintext)
     if (password === user.password) {
       console.log("record matched!!");
+
+      // new sessionid generated
+      const sessionid = crypto.randomBytes(16).toString("hex");
+
+      // check if session already exists and delete if there
+      await active_sesions.deleteOne({ username: user.username });
+
+      // storing new cookies to overwrite any previous cookies
+      res.cookie("username", user.username, {
+        path: "/api",
+        sameSite: "none",
+        secure: true,
+      });
+      res.cookie("sessionid", sessionid, {
+        path: "/api",
+        sameSite: "none",
+        secure: true,
+      });
+      const newSession = new active_sesions({
+        username: user.username,
+        sessionid: sessionid,
+      });
+      await newSession.save();
       return res.json({
         msg: "signIn successful",
         status: "approved",
@@ -117,12 +180,35 @@ app.post("/api/signup", async (req, res) => {
     // Create a new user
     const newUser = new login_credentials({
       email,
-      password, // Store the password in plaintext (not recommended)
+      password,
       username,
     });
 
     await newUser.save();
-    res.json({
+
+    // new session id
+    const sessionid = crypto.randomBytes(16).toString("hex");
+
+    // check if session already exists and delete if there
+    await active_sesions.deleteOne({ username: username });
+
+    // storing cookies
+    res.cookie("username", username, {
+      path: "/api",
+      sameSite: "none",
+      secure: true,
+    });
+    res.cookie("sessionid", sessionid, {
+      path: "/api",
+      sameSite: "none",
+      secure: true,
+    });
+    const newSession = new active_sesions({
+      username: username,
+      sessionid: sessionid,
+    });
+    await newSession.save();
+    return res.json({
       msg: "SignUp successful",
       status: "approved",
       user: {

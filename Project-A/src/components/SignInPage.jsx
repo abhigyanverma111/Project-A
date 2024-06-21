@@ -12,6 +12,7 @@ function AuthPage() {
   const handleSignIn = async (formData) => {
     const response = await fetch("http://127.0.0.1:4000/api/signin", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -37,6 +38,7 @@ function AuthPage() {
     }
     const response = await fetch("http://127.0.0.1:4000/api/signup", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },

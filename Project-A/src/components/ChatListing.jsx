@@ -25,7 +25,7 @@ export default function ChatListing({ chat }) {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      <h3 style={{ color: "#b8b7b6" }}>{chat.name}</h3>
+      <h3 style={{ color: "#b8b7b6" }}>{chat.activeWith}</h3>
       <p style={{ color: "#707070" }}>chat preview</p>
     </div>
   );

@@ -1,22 +1,22 @@
 import ChatList from "./ChatList";
 
-function ChatPage() {
-  let chats = [
-    { id: 1, name: "Conn" },
-    { id: 2, name: "Cherie" },
-    { id: 3, name: "Roma" },
-    { id: 4, name: "Paulita" },
-    { id: 5, name: "Birgit" },
-    { id: 6, name: "Faulkner" },
-    { id: 7, name: "Gunther" },
-    { id: 8, name: "Nadiya" },
-    { id: 9, name: "Dukie" },
-    { id: 10, name: "Wesley" },
-  ];
+async function ChatPage() {
+  // fetching chat-list from node server
+  let response = await fetch("http://127.0.0.1:4000/api/chatlist", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
+  });
+
+  let retrievedChats = await response.json();
+  console.log(retrievedChats);
 
   return (
     <div style={{ backgroundColor: "#010917" }}>
-      <ChatList chats={chats} />
+      <ChatList chats={retrievedChats.chats} />
     </div>
   );
 }

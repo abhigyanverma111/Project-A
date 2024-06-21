@@ -18,7 +18,7 @@ export default function ChatList({ chats }) {
     <div style={containerStyle}>
       <div style={listStyle}>
         {chats.map((chat) => (
-          <div key={chat.id}>
+          <div key={chat.username}>
             <ChatListing chat={chat} />
           </div>
         ))}
