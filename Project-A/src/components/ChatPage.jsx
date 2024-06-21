@@ -12,7 +12,7 @@ async function ChatPage() {
   });
 
   let retrievedChats = await response.json();
-  console.log(retrievedChats);
+  console.log(retrievedChats.chats);
 
   return (
     <div style={{ backgroundColor: "#010917" }}>
