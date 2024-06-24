@@ -7,5 +7,7 @@ const MessageSchema = mongoose.Schema({
   time: { type: Date, required: true },
 });
 
+MessageSchema.index({ sender: 1, receiver: 1, time: 1 });
+
 const Messages = mongoose.model("messages", MessageSchema);
 module.exports = Messages;

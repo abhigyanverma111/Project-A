@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const login_credentials = require("./LoginCredentials.model.cjs");
 const active_chats = require("./ActiveChats.model.cjs");
 const active_sesions = require("./ActiveSessions.model.cjs");
+const messages = require("./Messages.model.cjs");
 
 const app = express();
 
@@ -54,6 +55,52 @@ async function run() {
 // Routes definition
 app.get("/helloworld", (req, res) => {
   res.send("hello world");
+});
+
+app.post("/api/messageretrieval", async (req, res) => {
+  const { username, sessionid } = req.cookies;
+  const user2 = req.body.user2;
+  const user1 = username;
+  try {
+    const user = await login_credentials.findOne({ username: username });
+    if (!user) {
+      console.log("Username or email not found");
+      return res.status(400).json({
+        msg: "Username or email not found",
+        status: "failed",
+      });
+    }
+
+    const session = await active_sesions.findOne({ username: username });
+    if (!session) {
+      console.log("session not found");
+      return res.status(400).json({
+        msg: "session error, please login",
+        status: "falied",
+      });
+    }
+    if (session.sessionid === sessionid) {
+      console.log("record matched");
+      const messageArray = await messages
+        .find({
+          $or: [
+            { sender: user1, receiver: user2 },
+            { sender: user2, reveiver: user1 },
+          ],
+        })
+        .sort({ time: 1 });
+      return res.json({ status: "approved", messageArray });
+    } else {
+      console.log("session not found");
+      return res.status(400).json({
+        msg: "bad login",
+        status: "falied",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("server error");
+  }
 });
 
 app.post("/api/chatlist", async (req, res) => {

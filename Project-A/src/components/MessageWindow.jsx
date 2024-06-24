@@ -16,10 +16,26 @@ export default function MessageWindow({ currentChat }) {
     );
   }
   const [messageArray, setMessageArray] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const messageReaload = setInterval(async () => {
-      // message load code
-    }, 10000);
+      const response = await fetch(
+        "http://127.0.0.1:4000/api/messageretrieval",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user2: currentChat,
+          }),
+        }
+      );
+      const data = await response.json();
+      setMessageArray(data.messageArray);
+    }, 1000);
 
     return () => {
       clearInterval(messageReaload);
