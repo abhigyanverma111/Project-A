@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function ChatListing({ chat }) {
+export default function ChatListing({ chat, setCurrentChat }) {
   const [mouseHover, setHover] = useState(false);
 
   const setBackgroundColor = (mouseHover) => {
@@ -13,6 +13,9 @@ export default function ChatListing({ chat }) {
 
   return (
     <div
+      // onclick function
+      onClick={setCurrentChat(chat.activewith)}
+      // this will set current chat (hopefully)
       style={{
         width: "98%",
         height: "auto",
