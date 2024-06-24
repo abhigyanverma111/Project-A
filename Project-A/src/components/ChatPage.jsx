@@ -20,6 +20,7 @@ function ChatPage() {
         });
 
         const data = await response.json();
+        console.log("API Response:", data); // Log the response to check the structure
         if (data.status === "approved") {
           setChats(data.chats);
         } else {
