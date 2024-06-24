@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import ChatList from "./ChatList";
+import MessageWindow from "./MessageWindow";
 
 function ChatPage() {
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentChat, setCurrentChat] = useState(null);
 
   useEffect(() => {
     const fetchChatList = async () => {
@@ -32,6 +34,10 @@ function ChatPage() {
     };
 
     fetchChatList();
+
+    const IntervalId = setInterval(fetchChatList, 10000);
+
+    return () => clearInterval(IntervalId);
   }, []);
 
   if (loading) {
@@ -40,7 +46,8 @@ function ChatPage() {
 
   return (
     <div style={{ backgroundColor: "#010917" }}>
-      <ChatList chats={chats} />
+      <ChatList chats={chats} setCurrentChat={setCurrentChat} />
+      <MessageWindow currentChat="currentChat" />
     </div>
   );
 }
