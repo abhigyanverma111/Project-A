@@ -14,7 +14,9 @@ export default function ChatListing({ chat, setCurrentChat }) {
   return (
     <div
       // onclick function
-      onClick={setCurrentChat(chat.activewith)}
+      onClick={() => {
+        setCurrentChat(chat.activewith);
+      }}
       // this will set current chat (hopefully)
       style={{
         width: "98%",

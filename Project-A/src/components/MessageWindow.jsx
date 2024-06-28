@@ -35,10 +35,37 @@ export default function MessageWindow({ currentChat }) {
       );
       const data = await response.json();
       setMessageArray(data.messageArray);
-    }, 1000);
+      setLoading(false);
+    }, 10000);
 
     return () => {
       clearInterval(messageReaload);
     };
   }, [currentChat]);
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        Loading...
+      </div>
+    );
+  }
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      Sample Message Window
+    </div>
+  );
 }

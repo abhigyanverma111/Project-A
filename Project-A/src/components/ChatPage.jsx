@@ -47,7 +47,7 @@ function ChatPage() {
   return (
     <div style={{ backgroundColor: "#010917" }}>
       <ChatList chats={chats} setCurrentChat={setCurrentChat} />
-      <MessageWindow currentChat="currentChat" />
+      <MessageWindow currentChat={currentChat} />
     </div>
   );
 }
