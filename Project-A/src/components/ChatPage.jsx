@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ChatList from "./ChatList";
 import MessageWindow from "./MessageWindow";
+
 import "./../public/ChatPage.css"
 function ChatPage() {
   const [chats, setChats] = useState([]);
@@ -56,6 +57,7 @@ function ChatPage() {
         current={currentChat}
         style={{ zIndex: 10 }}
       />
+
     </div>
   );
 }

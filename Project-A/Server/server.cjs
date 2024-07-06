@@ -61,6 +61,9 @@ app.post("/api/messageretrieval", async (req, res) => {
   const { username, sessionid } = req.cookies;
   const user2 = req.body.user2;
   const user1 = username;
+
+  console.log(`Received request to retrieve messages between ${user1} and ${user2}`);
+  
   try {
     const user = await login_credentials.findOne({ username: username });
     if (!user) {
@@ -73,35 +76,79 @@ app.post("/api/messageretrieval", async (req, res) => {
 
     const session = await active_sesions.findOne({ username: username });
     if (!session) {
-      console.log("session not found");
+      console.log("Session not found");
       return res.status(400).json({
-        msg: "session error, please login",
-        status: "falied",
+        msg: "Session error, please login",
+        status: "failed",
       });
     }
+
     if (session.sessionid === sessionid) {
-      console.log("record matched");
+      console.log("Record matched. Fetching messages...");
+      
+      // Log the query parameters
+      console.log("Query parameters:", { user1, user2 });
+
       const messageArray = await messages
         .find({
           $or: [
             { sender: user1, receiver: user2 },
-            { sender: user2, reveiver: user1 },
+            { sender: user2, receiver: user1 }
           ],
         })
         .sort({ time: 1 });
+
+      console.log("Retrieved messages:", messageArray);
+
       return res.json({ status: "approved", messageArray });
     } else {
-      console.log("session not found");
+      console.log("Session mismatch");
       return res.status(400).json({
-        msg: "bad login",
-        status: "falied",
+        msg: "Bad login",
+        status: "failed",
       });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).send("server error");
+    console.error("Error during message retrieval:", error);
+    res.status(500).send("Server error");
   }
 });
+
+app.post("/api/sendmessage", async (req, res) => {
+  const { receiver, message } = req.body;
+  const sender = req.cookies.username; // Get the sender from the cookie
+
+  if (!sender) {
+    return res.status(400).json({
+      status: "failed",
+      message: "Sender not found in cookies",
+    });
+  }
+
+  try {
+    const newMessage = new messages({
+      sender,
+      receiver,
+      message,
+      time: new Date(),
+    });
+
+    await newMessage.save();
+
+    res.json({
+      status: "approved",
+      message: "Message sent successfully",
+    });
+  } catch (error) {
+    console.error("Error sending message:", error);
+    res.status(500).json({
+      status: "failed",
+      message: "Server error",
+    });
+  }
+});
+
+
 
 app.post("/api/chatlist", async (req, res) => {
   console.log(req);
