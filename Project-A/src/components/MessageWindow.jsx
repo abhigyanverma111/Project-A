@@ -1,3 +1,4 @@
+// MessageWindow.jsx
 import React, { useState, useEffect } from "react";
 import MessageBox from "./MessageBox";
 import "./../public/MessageWindow.css";
@@ -6,50 +7,70 @@ export default function MessageWindow({ current }) {
   const [messageArray, setMessageArray] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Function to fetch messages from the server
-  const fetchMessages = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch("http://127.0.0.1:4000/api/messageretrieval", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user2: current,
-        }),
-      });
-      const data = await response.json();
-      setMessageArray(data.messageArray);
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // UseEffect for initial fetch and cleanup
   useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          "http://127.0.0.1:4000/api/messageretrieval",
+          {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              user2: current,
+            }),
+          }
+        );
+        const data = await response.json();
+        setMessageArray(data.messageArray);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchMessages(); // Initial fetch
+
     const intervalId = setInterval(fetchMessages, 10000); // Fetch messages every 10 seconds
 
     return () => clearInterval(intervalId); // Cleanup the interval
   }, [current]);
 
-  // Function to handle sending messages
-  const handleSendMessage = (newMessage) => {
-    setMessageArray((prevArray) => [
-      ...prevArray,
-      { sender: getCookie("username"), message: newMessage, receiver: current },
-    ]);
-  };
+  const handleSendMessage = async (newMessage) => {
+    try {
+      const response = await fetch("http://127.0.0.1:4000/api/sendmessage", {
+        method: "POST",
+        credentials: "include", // Ensure cookies are sent
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          receiver: current,
+          message: newMessage,
+        }),
+      });
 
-  // Utility function to get cookie value
-  const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.status === "approved") {
+        // Update messageArray with the sender's name immediately
+        setMessageArray((prevMessages) => [
+          ...prevMessages,
+          { sender: data.sender, message: newMessage, receiver: current },
+        ]);
+      } else {
+        console.error("Message sending failed:", data.message);
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
   if (loading) {
@@ -73,7 +94,8 @@ export default function MessageWindow({ current }) {
       {messageArray.length > 0 ? (
         messageArray.map((message, index) => (
           <div key={index}>
-            <strong>{message.sender}: </strong>{message.message}
+            <strong>{message.sender}: </strong>
+            {message.message}
           </div>
         ))
       ) : (

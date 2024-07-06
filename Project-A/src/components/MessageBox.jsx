@@ -1,6 +1,7 @@
+// MessageBox.jsx
 import React, { useState } from "react";
 
-export default function MessageBox({ current, onSendMessage }) {
+export default function MessageBox({ onSendMessage }) {
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (e) => {
@@ -8,34 +9,12 @@ export default function MessageBox({ current, onSendMessage }) {
     if (!message.trim()) return;
 
     try {
-      const response = await fetch("http://127.0.0.1:4000/api/sendmessage", {
-        method: "POST",
-        credentials: "include", // Ensure cookies are sent
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          receiver: current,
-          message,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (data.status === "approved") {
-        onSendMessage(message);
-        setMessage("");
-      } else {
-        console.error("Message sending failed:", data.message);
-      }
+      await onSendMessage(message); // Pass message to parent component for sending
+      setMessage(""); // Clear message input after sending
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
-
 
   return (
     <div className="message-box">
