@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ChatList from "./ChatList";
 import MessageWindow from "./MessageWindow";
-
+import "./../public/ChatPage.css"
 function ChatPage() {
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,9 +45,17 @@ function ChatPage() {
   }
 
   return (
-    <div style={{ backgroundColor: "#010917" }}>
-      <ChatList chats={chats} setCurrentChat={setCurrentChat} />
-      <MessageWindow currentChat={currentChat} />
+    <div className="chat-page" style={{ backgroundColor: "" }}>
+      <ChatList
+        className="chat-list"
+        chats={chats}
+        setCurrentChat={setCurrentChat}
+      />
+      <MessageWindow
+        className="message-window"
+        current={currentChat}
+        style={{ zIndex: 10 }}
+      />
     </div>
   );
 }

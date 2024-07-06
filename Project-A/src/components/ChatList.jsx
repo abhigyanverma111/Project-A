@@ -1,5 +1,6 @@
 import React from "react";
 import ChatListing from "./ChatListing";
+import "./../public/ChatList.css";
 
 export default function ChatList({ chats, setCurrentChat }) {
   const containerStyle = {
@@ -15,7 +16,7 @@ export default function ChatList({ chats, setCurrentChat }) {
   };
 
   return (
-    <div style={containerStyle}>
+    <div id="containing" style={containerStyle}>
       <div style={listStyle}>
         {chats.map((chat) => (
           <div key={chat.activewith}>

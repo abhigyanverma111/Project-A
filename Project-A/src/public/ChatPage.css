@@ -1,0 +1,18 @@
+/* ChatPage.css */
+
+.chat-page {
+  display: flex;
+  height: 100vh;
+}
+
+.chat-list {
+  flex: 3;
+  background-color: #f0f0f0;
+  order: 1; /* Makes this div appear on the right */
+}
+
+.message-window {
+  flex: 1;
+  background-color: #e0e0e0;
+  order: 2; /* Makes this div appear on the left */
+}
