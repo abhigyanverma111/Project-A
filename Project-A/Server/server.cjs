@@ -6,7 +6,7 @@ const cors = require("cors");
 const crypto = require("crypto");
 const login_credentials = require("./LoginCredentials.model.cjs");
 const active_chats = require("./ActiveChats.model.cjs");
-const active_sesions = require("./ActiveSessions.model.cjs");
+const active_sessions = require("./ActiveSessions.model.cjs");
 const messages = require("./Messages.model.cjs");
 
 const app = express();
@@ -38,6 +38,7 @@ async function run() {
     console.error(error);
   }
 
+  // Uncomment the following if you need to create initial chat data
   // await active_chats.create({
   //   username: "abhigyan",
   //   activewith: "abhay",
@@ -49,7 +50,6 @@ async function run() {
 
   // const activeChats = await active_chats.find({});
   // console.log(activeChats);
-  //
 }
 
 // Routes definition
@@ -59,13 +59,13 @@ app.get("/helloworld", (req, res) => {
 
 app.post("/api/messageretrieval", async (req, res) => {
   const { username, sessionid } = req.cookies;
-  const user2 = req.body.user2;
+  const { user2 } = req.body;
   const user1 = username;
 
   console.log(`Received request to retrieve messages between ${user1} and ${user2}`);
-  
+
   try {
-    const user = await login_credentials.findOne({ username: username });
+    const user = await login_credentials.findOne({ username });
     if (!user) {
       console.log("Username or email not found");
       return res.status(400).json({
@@ -74,7 +74,7 @@ app.post("/api/messageretrieval", async (req, res) => {
       });
     }
 
-    const session = await active_sesions.findOne({ username: username });
+    const session = await active_sessions.findOne({ username });
     if (!session) {
       console.log("Session not found");
       return res.status(400).json({
@@ -85,15 +85,12 @@ app.post("/api/messageretrieval", async (req, res) => {
 
     if (session.sessionid === sessionid) {
       console.log("Record matched. Fetching messages...");
-      
-      // Log the query parameters
-      console.log("Query parameters:", { user1, user2 });
 
       const messageArray = await messages
         .find({
           $or: [
             { sender: user1, receiver: user2 },
-            { sender: user2, receiver: user1 }
+            { sender: user2, receiver: user1 },
           ],
         })
         .sort({ time: 1 });
@@ -111,6 +108,59 @@ app.post("/api/messageretrieval", async (req, res) => {
   } catch (error) {
     console.error("Error during message retrieval:", error);
     res.status(500).send("Server error");
+  }
+});
+
+app.post("/api/newchat", async (req, res) => {
+  const { activewith } = req.body;
+  const { username, sessionid } = req.cookies;
+
+  if (!username) {
+    return res.status(400).json({
+      status: "failed",
+      message: "Sender not found in cookies",
+    });
+  }
+
+  try {
+    const wantedUser = await login_credentials.findOne({ username: activewith });
+    if (!wantedUser) {
+      console.log("Username or email not found");
+      return res.status(400).json({
+        status: "failed",
+        message: "Username or email not found",
+      });
+    }
+
+    const session = await active_sessions.findOne({ username });
+    if (!session) {
+      console.log("Session not found");
+      return res.status(400).json({
+        status: "failed",
+        message: "Session error, please login",
+      });
+    }
+
+    if (session.sessionid === sessionid) {
+      const newChat = new active_chats({ username, activewith });
+      await newChat.save();
+      return res.json({
+        status: "approved",
+        message: "Chat activated successfully",
+      });
+    } else {
+      console.log("Session ID mismatch");
+      return res.status(400).json({
+        status: "failed",
+        message: "Bad login",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: "failed",
+      message: "Server error",
+    });
   }
 });
 
@@ -148,13 +198,11 @@ app.post("/api/sendmessage", async (req, res) => {
   }
 });
 
-
-
 app.post("/api/chatlist", async (req, res) => {
-  console.log(req);
   const { username, sessionid } = req.cookies;
+
   try {
-    const user = await login_credentials.findOne({ username: username });
+    const user = await login_credentials.findOne({ username });
     if (!user) {
       console.log("Username or email not found");
       return res.status(400).json({
@@ -163,28 +211,33 @@ app.post("/api/chatlist", async (req, res) => {
       });
     }
 
-    const session = await active_sesions.findOne({ username: username });
+    const session = await active_sessions.findOne({ username });
     if (!session) {
-      console.log("session not found");
+      console.log("Session not found");
       return res.status(400).json({
-        msg: "session error, please login",
-        status: "falied",
+        msg: "Session error, please login",
+        status: "failed",
       });
     }
+
     if (session.sessionid === sessionid) {
-      console.log("record matched");
-      let chats = await active_chats.find({ username: username });
+      console.log("Record matched");
+
+      const chats = await active_chats.find({
+        username
+      });
+      
       return res.json({ status: "approved", chats });
     } else {
-      console.log("session not found");
+      console.log("Session mismatch");
       return res.status(400).json({
-        msg: "bad login",
-        status: "falied",
+        msg: "Bad login",
+        status: "failed",
       });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).send("server error");
+    res.status(500).send("Server error");
   }
 });
 
@@ -205,19 +258,18 @@ app.post("/api/signin", async (req, res) => {
         status: "failed",
       });
     }
-    //console.log("record found", user);
 
     // Compare the provided password with the stored password (plaintext)
     if (password === user.password) {
-      console.log("record matched!!");
+      console.log("Record matched!");
 
-      // new sessionid generated
+      // Generate new session ID
       const sessionid = crypto.randomBytes(16).toString("hex");
 
-      // check if session already exists and delete if there
-      await active_sesions.deleteOne({ username: user.username });
+      // Delete any existing sessions for the user
+      await active_sessions.deleteOne({ username: user.username });
 
-      // storing new cookies to overwrite any previous cookies
+      // Store cookies to overwrite any previous cookies
       res.cookie("username", user.username, {
         path: "/api",
         sameSite: "none",
@@ -228,13 +280,16 @@ app.post("/api/signin", async (req, res) => {
         sameSite: "none",
         secure: true,
       });
-      const newSession = new active_sesions({
+
+      // Save the new session
+      const newSession = new active_sessions({
         username: user.username,
         sessionid: sessionid,
       });
       await newSession.save();
+
       return res.json({
-        msg: "signIn successful",
+        msg: "SignIn successful",
         status: "approved",
         user: {
           email: user.email,
@@ -249,7 +304,7 @@ app.post("/api/signin", async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).send("server error");
+    res.status(500).send("Server error");
   }
 });
 
@@ -261,7 +316,7 @@ app.post("/api/signup", async (req, res) => {
   try {
     // Check if user already exists by email or username
     const existingUser = await login_credentials.findOne({
-      $or: [{ email: email }, { username: username }],
+      $or: [{ email }, { username }],
     });
 
     if (existingUser) {
@@ -280,13 +335,13 @@ app.post("/api/signup", async (req, res) => {
 
     await newUser.save();
 
-    // new session id
+    // Generate new session ID
     const sessionid = crypto.randomBytes(16).toString("hex");
 
-    // check if session already exists and delete if there
-    await active_sesions.deleteOne({ username: username });
+    // Delete any existing sessions for the user
+    await active_sessions.deleteOne({ username });
 
-    // storing cookies
+    // Store cookies
     res.cookie("username", username, {
       path: "/api",
       sameSite: "none",
@@ -297,11 +352,14 @@ app.post("/api/signup", async (req, res) => {
       sameSite: "none",
       secure: true,
     });
-    const newSession = new active_sesions({
+
+    // Save the new session
+    const newSession = new active_sessions({
       username: username,
       sessionid: sessionid,
     });
     await newSession.save();
+
     return res.json({
       msg: "SignUp successful",
       status: "approved",
@@ -312,7 +370,7 @@ app.post("/api/signup", async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send("server error");
+    res.status(500).send("Server error");
   }
 });
 
