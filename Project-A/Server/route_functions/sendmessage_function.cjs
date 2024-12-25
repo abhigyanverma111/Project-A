@@ -1,3 +1,14 @@
+const express = require("express");
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const crypto = require("crypto");
+const login_credentials = require("../LoginCredentials.model.cjs");
+const active_chats = require("../ActiveChats.model.cjs");
+const active_sessions = require("../ActiveSessions.model.cjs");
+const messages = require("../Messages.model.cjs");
+
 const sendmessage_function = async (req, res) => {
   const { receiver, message } = req.body;
   const sender = req.cookies.username; // Get the sender from the cookie
