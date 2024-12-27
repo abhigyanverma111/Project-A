@@ -69,76 +69,111 @@ function AuthPage() {
       handleSignUp(formData);
     }
   };
+  const containerStyle = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100vh",
+    backgroundColor: "#000000", // Black background
+    color: "#FFFFFF", // White text
+  };
+
+  const formStyle = {
+    display: "flex",
+    flexDirection: "column",
+    backgroundColor: "#031636", // Dark blue background
+    padding: "20px",
+    borderRadius: "10px",
+    width: "300px",
+  };
+
+  const inputStyle = {
+    marginBottom: "10px",
+    padding: "10px",
+    borderRadius: "5px",
+    border: "1px solid #043991", // Blue border
+    color: "#FFFFFF", // White text
+    backgroundColor: "#000000", // Black background
+  };
+
+  const buttonStyle = {
+    padding: "10px 20px",
+    border: "none",
+    borderRadius: "5px",
+    backgroundColor: "#043991", // Bright blue button
+    color: "#FFFFFF", // White text
+    cursor: "pointer",
+  };
+
+  const toggleButtonStyle = {
+    marginTop: "10px",
+    background: "none",
+    border: "none",
+    color: "#FFFFFF",
+    textDecoration: "underline",
+    cursor: "pointer",
+  };
 
   return (
-    <div className="auth-container">
+    <div style={containerStyle}>
       <h2>{isSignUp ? "Sign Up" : "Sign In"}</h2>
-      <form onSubmit={handleSubmit}>
+      <form style={formStyle} onSubmit={handleSubmit}>
         {isSignUp && (
           <>
-            <div id="signupEmail">
-              <label htmlFor="email">Email:</label>
-              <input
-                type="email"
-                placeholder="Enter email"
-                required
-                name="email"
-              />
-            </div>
-            <div id="signupUsername">
-              <label htmlFor="username">Username:</label>
-              <input
-                type="text"
-                placeholder="Enter username"
-                required
-                name="username"
-              />
-            </div>
-            <div id="signupPassword">
-              <label htmlFor="password">Password:</label>
-              <input
-                type="password"
-                placeholder="Enter password"
-                required
-                name="password"
-              />
-            </div>
-            <div id="signupConfirmPassword">
-              <label htmlFor="confirmPassword">Confirm Password:</label>
-              <input
-                type="password"
-                placeholder="Confirm password"
-                required
-                name="confirmPassword"
-              />
-            </div>
+            <input
+              type="email"
+              placeholder="Enter email"
+              required
+              name="email"
+              style={inputStyle}
+            />
+            <input
+              type="text"
+              placeholder="Enter username"
+              required
+              name="username"
+              style={inputStyle}
+            />
+            <input
+              type="password"
+              placeholder="Enter password"
+              required
+              name="password"
+              style={inputStyle}
+            />
+            <input
+              type="password"
+              placeholder="Confirm password"
+              required
+              name="confirmPassword"
+              style={inputStyle}
+            />
           </>
         )}
         {!isSignUp && (
           <>
-            <div id="signInUsernameOrEmail">
-              <label htmlFor="emailOrUsername">Username/Email:</label>
-              <input
-                type="text"
-                placeholder="Enter username or email"
-                required
-                name="emailOrUsername" // Changed name to emailOrUsername
-              />
-            </div>
-            <div id="signInPassword">
-              <label htmlFor="password">Password:</label>
-              <input
-                type="password"
-                placeholder="Enter password"
-                required
-                name="password"
-              />
-            </div>
+            <input
+              type="text"
+              placeholder="Username or Email"
+              required
+              name="emailOrUsername"
+              style={inputStyle}
+            />
+            <input
+              type="password"
+              placeholder="Enter password"
+              required
+              name="password"
+              style={inputStyle}
+            />
           </>
         )}
-        <button type="submit">{isSignUp ? "Sign Up" : "Sign In"}</button>
+        <button type="submit" style={buttonStyle}>
+          {isSignUp ? "Sign Up" : "Sign In"}
+        </button>
       </form>
-      <button onClick={toggleAuthMode}>
+      <button onClick={toggleAuthMode} style={toggleButtonStyle}>
         {isSignUp ? "Already have an account?" : "New User?"}
       </button>
     </div>

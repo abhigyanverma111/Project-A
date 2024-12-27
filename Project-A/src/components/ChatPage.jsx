@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import ChatList from "./ChatList";
 import MessageWindow from "./MessageWindow";
-
 import "./../public/ChatPage.css";
+
 function ChatPage() {
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +21,6 @@ function ChatPage() {
         });
 
         const data = await response.json();
-        console.log("API Response:", data); // Log the response to check the structure
         if (data.status === "approved") {
           setChats(data.chats);
         } else {
@@ -48,17 +47,9 @@ function ChatPage() {
   }
 
   return (
-    <div className="chat-page" style={{ backgroundColor: "" }}>
-      <ChatList
-        className="chat-list"
-        chats={chats}
-        setCurrentChat={setCurrentChat}
-      />
-      <MessageWindow
-        className="message-window"
-        current={currentChat}
-        style={{ zIndex: 10 }}
-      />
+    <div className="chat-page">
+      <ChatList chats={chats} setCurrentChat={setCurrentChat} />
+      <MessageWindow current={currentChat} />
     </div>
   );
 }

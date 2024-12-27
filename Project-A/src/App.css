@@ -1,0 +1,104 @@
+/* app.css */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #000000; /* Black background */
+  color: #ffffff; /* White text */
+}
+
+button {
+  background-color: #043991; /* Blue button background */
+  color: #ffffff; /* White text */
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #052d7b; /* Slightly darker blue on hover */
+}
+
+input {
+  background-color: #1a1a1a; /* Dark background for inputs */
+  color: #ffffff; /* White text */
+  border: 1px solid #043991; /* Blue border */
+  border-radius: 5px;
+  padding: 8px;
+  margin: 5px 0;
+}
+
+input:focus {
+  outline: none;
+  border: 1px solid #052d7b; /* Darker blue on focus */
+}
+
+.auth-container,
+.message-window,
+.chat-list {
+  background-color: #1a1a1a; /* Dark grey for sections */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+h2 {
+  color: #ffffff; /* White headers */
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #ffffff; /* White label text */
+}
+
+#containing {
+  display: flex;
+}
+
+.chat-list {
+  width: 30%;
+  border-right: 1px solid #043991;
+}
+
+.message-window {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.message-box {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.message-box input {
+  flex: 1;
+}
+
+.message-box button {
+  padding: 10px 20px;
+}
+
+.chat-page {
+  display: flex;
+  height: 100vh;
+}
+
+.chat-list div:hover {
+  background-color: #043991; /* Blue highlight for hover */
+}
+
+h3,
+p {
+  margin: 0;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

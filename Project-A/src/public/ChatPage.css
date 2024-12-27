@@ -1,18 +1,20 @@
-/* ChatPage.css */
-
 .chat-page {
-  display: flex;
-  height: 100vh;
+  display: flex; /* Flexbox layout for side-by-side components */
+  height: 100vh; /* Full viewport height */
+  background-color: #000000; /* Black background */
+  color: #ffffff; /* White text */
 }
 
 .chat-list {
-  flex: 3;
-  background-color: #f0f0f0;
-  order: 1; /* Makes this div appear on the right */
+  width: 30%; /* Take 30% of the width for ChatList */
+  height: 100%; /* Full height */
+  border-right: 1px solid #1a1a1a; /* Optional: Divider between ChatList and MessageWindow */
 }
 
 .message-window {
-  flex: 1;
-  background-color: #e0e0e0;
-  order: 2; /* Makes this div appear on the left */
+  flex: 1; /* Take remaining space */
+  height: 100%; /* Full height */
+  padding: 10px; /* Add some spacing */
+  background-color: #1a1a1a; /* Dark gray for the message window background */
+  color: #ffffff; /* Ensure text is white */
 }
