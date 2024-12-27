@@ -35,6 +35,12 @@ function ChatPage() {
     };
 
     fetchChatList();
+
+    const newInterval = setInterval(fetchChatList, 10000);
+
+    return () => {
+      clearInterval(newInterval);
+    };
   }, []);
 
   if (loading) {
