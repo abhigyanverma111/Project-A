@@ -6,7 +6,7 @@ Couldnt come up with a name quick enough, so this
 Project-A is a simple browser-based chat application, wiht UI modeled after WhatsApp-Web. 
 It includes 
 - email/userid and password based login
-- simple email based account creation
+- simple email based account creation with verification
 - friend lookup using userid to start new chat
-
+- cookies for account authentication
 
